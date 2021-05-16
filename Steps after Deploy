@@ -1,0 +1,46 @@
+kubectl exec -it mongo-0 -- mongo
+rs.initiate()
+var cfg = rs.conf()
+cfg.members[0].host="mongo-0.mongo:27017"
+rs.reconfig(cfg)
+rs.status()
+rs.add("mongo-1.mongo:27017")
+rs.add("mongo-2.mongo:27017")
+rs.status()
+bye
+
+kubectl run mango --rm -it --image mongo -- sh
+mongo mongodb://mongo-0.mongo,mongo-1.mongo,mongo-2.mongo
+rs.status()
+
+mongo mongodb://mongo-0.mongo,mongo-1.mongo,mongo-2.mongo --eval 'rs.status()' | grep name
+
+mongo mongodb://mongo-0.mongo,mongo-1.mongo,mongo-2.mongo/admin?replicaSet=rs0
+
+show dbs
+
+kubectl expose pod mongo-0 --port 27017 --target-port 27017 --type LoadBalancer
+
+use inventory
+
+db.books.insertMany([
+   { title: "Moby Dick", author: "Herman Melville" },
+   { title: "The Great Gatsby", author: "F. Scott Fitzgerald" },
+   { title: "One Hundred Years of Solitude", author: "Gabriel Garcia Marquez" }
+]);
+
+db.books.find({}).pretty()
+
+db.createUser({  
+ user:"aamsuser",
+ pwd:"mcmsaamsadmin",
+ roles:[  
+  {  
+     role:"readWrite",
+     db:"u8"
+  }
+ ],
+ mechanisms:[  
+  "SCRAM-SHA-1"
+ ]
+})
