@@ -31,16 +31,3 @@ db.books.insertMany([
 
 db.books.find({}).pretty()
 
-db.createUser({  
- user:"aamsuser",
- pwd:"mcmsaamsadmin",
- roles:[  
-  {  
-     role:"readWrite",
-     db:"u8"
-  }
- ],
- mechanisms:[  
-  "SCRAM-SHA-1"
- ]
-})
